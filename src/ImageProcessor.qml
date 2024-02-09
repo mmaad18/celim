@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 
 ApplicationWindow {
     visible: true
@@ -19,42 +21,62 @@ ApplicationWindow {
                 spacing: 10
 
                 Label {
-                    text: "Mappe plassering:"
+                    text: qsTr("Plassering:")
                 }
 
                 TextField {
-                    id: folderPath
+                    id: targetPath
                     width: 200
-                    placeholderText: qsTr("Path to folder containing files")
+                    placeholderText: qsTr("Velg sti til mappe eller fil...")
                 }
 
-                Button {
-                    text: "Get Folder Path"
-                    onClicked: {
-                        // Call the Python method from QML
-                        var path = backend.getFolderPath()
-                        console.log("The folder path is: " + path)
+                FolderDialog {
+                    id: folderDialog
+                    currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+                    onAccepted: {
+                        backend.setFolderPath(folderDialog.folderUrl)
+                        targetPath.text = backend.getFilePath()
                     }
                 }
 
+                FileDialog {
+                    id: fileDialog
+                    currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+                    onAccepted: backend.setFilePath(fileDialog.fileUrl)
+                }
+
+                Button {
+                    text: qsTr("Velg Mappe")
+                    onClicked: {
+                        folderDialog.open()
+                    }
+                }
+
+                Button {
+                    text: qsTr("Velg Bilde")
+                    onClicked: {
+                        fileDialog.open()
+                    }
+                }
             }
 
+            // Value goes from 0 to 1, unless specified using "from" and "to"
             ProgressBar {
                 id: progressBar
-                width: 200
-                value: 0 // This will be updated dynamically
+                width: 300
+                value: 0
             }
 
             Row {
                 Button {
-                    text: "Start"
+                    text: qsTr("Start")
                     onClicked: {
                         // Start processing logic
                     }
                 }
 
                 Button {
-                    text: "Avslutt"
+                    text: qsTr("Avslutt")
                     onClicked: {
                         Qt.quit()
                     }
@@ -64,7 +86,7 @@ ApplicationWindow {
                     text: "Process Folder"
                     onClicked: {
                         // Send the folderPath value to Python
-                        backend.processFolderPath(folderPath.text)
+                        backend.processFolderPath(targetPath.text)
                     }
                 }
 

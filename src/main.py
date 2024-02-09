@@ -13,9 +13,7 @@ def main():
 
     backend = Backend()
     engine.rootContext().setContextProperty("backend", backend)
-
-    # Load the QML file
-    engine.load(QUrl.fromLocalFile('ImageProcessor.qml'))
+    engine.load(QUrl.fromLocalFile('src/ImageProcessor.qml'))
 
     if not engine.rootObjects():
         sys.exit(-1)

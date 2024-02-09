@@ -1,6 +1,3 @@
-
-from CellCounter import *
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -8,6 +5,7 @@ from scipy import signal
 
 def load_image(path: str):
     return plt.imread(path)
+
 
 def load_image_gray(path: str):
     image_array = plt.imread(path)
@@ -53,5 +51,3 @@ def thresholding(image, threshold=(0.1, 0.2), new_value=1):
                 output[i, j] = new_value
 
     return output
-
-

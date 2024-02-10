@@ -1,7 +1,8 @@
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtCore import QObject, Slot, Signal
 
 
 class Backend(QObject):
+    folderPathChanged = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -10,12 +11,10 @@ class Backend(QObject):
 
     @Slot(str)
     def getFolderPath(self):
-        # This method will be called from QML
         return self.folderPath
 
     @Slot(str)
     def getFilePath(self):
-        # This method will be called from QML
         return self.filePath
 
     @Slot(str)

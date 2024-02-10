@@ -6,6 +6,13 @@ from PySide6.QtWidgets import QApplication
 
 from Backend import Backend
 
+from PySide6.QtCore import __version__ as PYSIDE_VERSION
+from PySide6.QtCore import qVersion
+
+print("Qt version:", qVersion())
+print("PySide version:", PYSIDE_VERSION)
+
+
 
 def main():
     app = QApplication(sys.argv)

@@ -18,7 +18,7 @@ ApplicationWindow {
             text: qsTr("Single File")
         }
         TabButton {
-            text: qsTr("Folder")
+            text: qsTr("Mappe")
         }
     }
 

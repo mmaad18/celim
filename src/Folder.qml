@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtCore
+import QtQml
 
 Rectangle {
     width: 640
@@ -22,7 +23,15 @@ Rectangle {
             TextField {
                 id: targetPath
                 width: 200
-                placeholderText: qsTr("Velg sti til mappe eller fil...")
+                placeholderText: qsTr("Velg sti til mappe...")
+                text: backend.folderPath
+            }
+
+            Connections {
+                target: backend
+                function onFolderPathChanged (path) {
+                    targetPath.text = path
+                }
             }
 
             FolderDialog {
@@ -30,12 +39,11 @@ Rectangle {
                 currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
                 onAccepted: {
                     backend.setFolderPath(folderDialog.selectedFolder)
-                    targetPath.text = backend.getFolderPath()
                 }
             }
 
             Button {
-                text: qsTr("Choose Folder")
+                text: qsTr("Velg mappe")
                 onClicked: {
                     folderDialog.open()
                 }

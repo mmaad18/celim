@@ -1,21 +1,33 @@
-from PySide6.QtCore import QObject, Slot, Signal
-
+from PySide6.QtCore import QObject, Signal, Slot
 
 class Backend(QObject):
-    folderPathChanged = Signal(str)
+    folderPathChanged = Signal(str)  # Signal to emit when the folder path changes
+    filePathChanged = Signal(str)    # Signal to emit when the file path changes
 
     def __init__(self):
         super().__init__()
-        self.folderPath = ""
-        self.filePath = ""
+        self._folderPath = ""
+        self._filePath = ""
 
-    @Slot(str)
-    def getFolderPath(self):
-        return self.folderPath
+    @property
+    def folderPath(self):
+        return self._folderPath
 
-    @Slot(str)
-    def getFilePath(self):
-        return self.filePath
+    @folderPath.setter
+    def folderPath(self, value):
+        if self._folderPath != value:
+            self._folderPath = value
+            self.folderPathChanged.emit(self._folderPath)  # Emit signal with new value
+
+    @property
+    def filePath(self):
+        return self._filePath
+
+    @filePath.setter
+    def filePath(self, value):
+        if self._filePath != value:
+            self._filePath = value
+            self.filePathChanged.emit(self._filePath)  # Emit signal with new value
 
     @Slot(str)
     def setFolderPath(self, folderPath):
@@ -23,8 +35,7 @@ class Backend(QObject):
         if folderPath.startswith('file:///'):
             folderPath = folderPath[8:]
         print(f"Selected folder: {folderPath}")
-        self.folderPath = folderPath
-
+        self.folderPath = folderPath  # Use the setter
 
     @Slot(str)
     def setFilePath(self, filePath):
@@ -32,4 +43,4 @@ class Backend(QObject):
         if filePath.startswith('file:///'):
             filePath = filePath[8:]
         print(f"Selected file: {filePath}")
-        self.filePath = filePath
+        self.filePath = filePath  # Use the setter

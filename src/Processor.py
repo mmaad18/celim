@@ -1,6 +1,10 @@
+import os
+import time
 
 from skimage import feature
 import matplotlib.pyplot as plt
+
+from src.ImageManipulations import load_image_gray
 
 
 def detect_blobs(image, color='red', name='blobs'):
@@ -28,4 +32,15 @@ def detect_blobs(image, color='red', name='blobs'):
     return len(blobs_log)
 
 
+
+def batch_convert(folder_path, backend):
+    files = os.listdir(folder_path)
+    backend.progress = 0.0
+
+    for i, file in enumerate(files):
+        if file.endswith('.tif'):
+            image = load_image_gray(os.path.join(folder_path, file))
+            detect_blobs(image, color='red', name=f'{file}_blobs')
+            backend.progress = i + 1
+            time.sleep(0.1)
 

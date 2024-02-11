@@ -22,24 +22,10 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 200
+                width: 300
                 placeholderText: qsTr("Velg sti til mappe...")
                 text: backend.folderPath
-            }
-
-            Connections {
-                target: backend
-                function onFolderPathChanged (path) {
-                    targetPath.text = path
-                }
-            }
-
-            FolderDialog {
-                id: folderDialog
-                currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
-                onAccepted: {
-                    backend.setFolderPath(folderDialog.selectedFolder)
-                }
+                readOnly: true
             }
 
             Button {
@@ -50,18 +36,36 @@ Rectangle {
             }
         }
 
+        Row {
+            spacing: 10
+
+            CheckBox {
+                id: edgeX
+                checked: true
+                text: qsTr("Kantdeteksjon Horisontal")
+            }
+            CheckBox {
+                id: edgeY
+                checked: false
+                text: qsTr("Kantdeteksjon Vertikal")
+            }
+        }
+
         // Value goes from 0 to 1, unless specified using "from" and "to"
         ProgressBar {
             id: progressBar
-            width: 300
-            value: 0
+            width: 445
+            value: backend.progress
         }
 
         Row {
+            spacing: 10
+
             Button {
                 text: qsTr("Start")
                 onClicked: {
-                    // Start processing logic
+                    //backend.batchConvert(edgeX.checked, edgeY.checked)
+                    backend.startProcessing()
                 }
             }
 
@@ -71,6 +75,24 @@ Rectangle {
                     Qt.quit()
                 }
             }
+        }
+    }
+
+    Connections {
+        target: backend
+        function onFolderPathChanged (path) {
+            targetPath.text = path
+        }
+        function onProgressChanged (progress) {
+            progressBar.value = progress
+        }
+    }
+
+    FolderDialog {
+        id: folderDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            backend.setFolderPath(folderDialog.selectedFolder)
         }
     }
 }

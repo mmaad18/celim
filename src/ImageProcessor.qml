@@ -13,7 +13,6 @@ ApplicationWindow {
     TabBar {
         id: tabBar
         width: parent.width
-        currentIndex: stackView.currentIndex
         TabButton {
             text: qsTr("Single File")
         }
@@ -24,9 +23,9 @@ ApplicationWindow {
 
     StackLayout {
         id: stackView
+        currentIndex: tabBar.currentIndex
         anchors.fill: parent
         anchors.topMargin: tabBar.height
-        currentIndex: tabBar.currentIndex
 
         Item {
             id: singleFile

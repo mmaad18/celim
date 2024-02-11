@@ -17,24 +17,28 @@ class Backend(QObject):
         self._filePath = ""
         self._progress = 0.0
 
+        self.setupWorkerAndThread()
+
+    def setupWorkerAndThread(self):
         self.thread = QThread()
-        self.worker = Worker()
+        self.worker = Worker()  # Make sure Worker is properly defined elsewhere
         self.worker.moveToThread(self.thread)
 
         # Connect signals
         self.worker.progressChanged.connect(self.setProgress)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.thread.quit)  # Request thread to quit when worker is done
+        self.thread.finished.connect(self.cleanUp)  # Cleanup when thread finishes
 
-        # Connect the thread's started signal to the worker's testRun slot
-        self.thread.started.connect(self.worker.testRun)
+        self.worker.finished.connect(self.worker.deleteLater)  # Ensure worker is deleted safely
+        self.thread.finished.connect(self.thread.deleteLater)  # Ensure thread is deleted safely
 
-        # Clean up
-        self.thread.finished.connect(self.thread.deleteLater)
+    def cleanUp(self):
+        # Cleanup has been simplified as deletion and quit requests are handled via signals
+        print("Cleanup completed")
 
-    def onWorkerFinished(self):
-        self.worker.deleteLater()  # Clean up the worker when finished
-        self.thread.quit()  # Quit the thread
+        # Optionally, reinitialize the worker and thread for the next use if needed
+        self.thread = None
+        self.worker = None
 
 
     '''
@@ -94,32 +98,22 @@ class Backend(QObject):
     def setProgress(self, progress):
         print(f"Progress: {progress}")
         self.progress = progress
-        self.progressChanged.emit(progress)
 
     '''
     # Batch processing
     '''
     @Slot(bool, bool)
     def batchConvert(self, edgeX, edgeY):
-        if not self.thread.isRunning():
-            try:
-                self.thread.started.disconnect()
-            except RuntimeError:
-                pass
+        if not self.thread or not self.thread.isRunning():
+            self.setupWorkerAndThread()
 
-            #self.thread.started.connect(lambda: self.worker.batchConvert(self.folderPath, edgeX, edgeY))
-            self.thread.started.connect(lambda: self.worker.testRun())
+            self.worker.setBatchParams(self.folderPath, edgeX, edgeY)
+            self.thread.started.connect(self.worker.batchConvert)
             self.thread.start()
         else:
             print("A batch conversion is already running.")
 
 
-    @Slot()
-    def startProcessing(self):
-        if not self.thread.isRunning():
-            self.thread.start()
-        else:
-            print("Already running.")
 
 
 

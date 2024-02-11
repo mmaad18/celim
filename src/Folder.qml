@@ -64,8 +64,7 @@ Rectangle {
             Button {
                 text: qsTr("Start")
                 onClicked: {
-                    //backend.batchConvert(edgeX.checked, edgeY.checked)
-                    backend.startProcessing()
+                    backend.batchConvert(edgeX.checked, edgeY.checked)
                 }
             }
 

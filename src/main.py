@@ -5,8 +5,6 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWidgets import QApplication
 
 from Backend import Backend
-from Processor import *
-from src.Worker import Worker
 
 
 def main():

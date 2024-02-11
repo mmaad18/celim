@@ -4,7 +4,7 @@ import time
 from skimage import feature
 import matplotlib.pyplot as plt
 
-from src.ImageManipulations import load_image_gray
+from ImageManipulations import load_image_gray
 
 
 def detect_blobs(image, color='red', name='blobs'):

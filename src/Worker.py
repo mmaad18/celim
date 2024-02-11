@@ -1,7 +1,8 @@
+
 import os
 
-from PySide6.QtCore import QThread, Slot, Signal, QObject
-from src.ImageManipulations import *
+from PySide6.QtCore import Slot, Signal, QObject
+from ImageManipulations import *
 
 
 class Worker(QObject):
@@ -31,11 +32,17 @@ class Worker(QObject):
         self.progressChanged.emit(progress)
 
         for i, file in enumerate(tif_files):
+            file_name = file.split('.')[0]
             image_gray = load_image_gray(os.path.join(self.folderPath, file))
-            save_image_gray(image_gray, f'out/{file}{i + 1}.png')
+            save_image_gray(image_gray, f'out/{file_name}{i + 1}.png')
 
-            image_conv = edge_detection_x(image_gray)
-            save_image_gray(image_conv, '../out/conv.png')
+            if self.edgeX:
+                image_conv = edge_detection_x(image_gray)
+                save_image_gray(image_conv, f'out/{file_name}_edgeX_{i + 1}.png')
+
+            if self.edgeY:
+                image_conv = edge_detection_y(image_gray)
+                save_image_gray(image_conv, f'out/{file_name}_edgeY_{i + 1}.png')
 
             progress = (i + 1) / file_count
             self.progressChanged.emit(progress)

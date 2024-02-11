@@ -1,9 +1,7 @@
-import os
 
 from PySide6.QtCore import QObject, Signal, Slot, QThread
 
-from src.ImageManipulations import *
-from src.Worker import Worker
+from Worker import Worker
 
 
 class Backend(QObject):

@@ -21,8 +21,10 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 200
-                placeholderText: qsTr("Velg sti til mappe eller fil...")
+                width: 300
+                placeholderText: qsTr("Velg sti til bilde...")
+                text: backend.filePath
+                readOnly: true
             }
 
             FileDialog {
@@ -32,7 +34,7 @@ Rectangle {
             }
 
             Button {
-                text: qsTr("Choose Image")
+                text: qsTr("Velg Bilde")
                 onClicked: {
                     fileDialog.open()
                 }
@@ -40,8 +42,34 @@ Rectangle {
         }
 
         Row {
+            spacing: 10
+
+            Label {
+                text: qsTr("Nedre Grense:")
+            }
+
+            TextField {
+                id: lowerBound
+                width: 90
+                validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+            }
+
+            Label {
+                text: qsTr("Øvre Grense:")
+            }
+
+            TextField {
+                id: upperBound
+                width: 90
+                validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+            }
+        }
+
+        Row {
+            spacing: 10
+
             Button {
-                text: qsTr("Start")
+                text: qsTr("Segmenter")
                 onClicked: {
                     // Start processing logic
                 }

@@ -14,7 +14,10 @@ ApplicationWindow {
         id: tabBar
         width: parent.width
         TabButton {
-            text: qsTr("Single File")
+            text: qsTr("Segmentering")
+        }
+        TabButton {
+            text: qsTr("Telling")
         }
         TabButton {
             text: qsTr("Mappe")
@@ -28,8 +31,13 @@ ApplicationWindow {
         anchors.topMargin: tabBar.height
 
         Item {
-            id: singleFile
-            Loader { source: "SingleFile.qml" }
+            id: segmentation
+            Loader { source: "Segmentation.qml" }
+        }
+
+        Item {
+            id: counting
+            Loader { source: "Counting.qml" }
         }
 
         Item {

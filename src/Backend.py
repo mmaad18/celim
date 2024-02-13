@@ -111,7 +111,19 @@ class Backend(QObject):
         else:
             print("A batch conversion is already running.")
 
+    '''
+    # Segmentation
+    '''
+    @Slot(float, float)
+    def segmentation(self, lowerThreshold, upperThreshold):
+        if not self.thread or not self.thread.isRunning():
+            self.setupWorkerAndThread()
 
+            self.worker.setSegmentationParams(self.filePath, lowerThreshold, upperThreshold)
+            self.thread.started.connect(self.worker.segmentation)
+            self.thread.start()
+        else:
+            print("A segmentation is already running.")
 
 
 

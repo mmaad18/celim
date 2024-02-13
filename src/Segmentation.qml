@@ -27,12 +27,6 @@ Rectangle {
                 readOnly: true
             }
 
-            FileDialog {
-                id: fileDialog
-                currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
-                onAccepted: backend.setFilePath(fileDialog.fileUrl)
-            }
-
             Button {
                 text: qsTr("Velg Bilde")
                 onClicked: {
@@ -51,7 +45,7 @@ Rectangle {
             TextField {
                 id: lowerBound
                 width: 90
-                validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+                //validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
             }
 
             Label {
@@ -61,7 +55,7 @@ Rectangle {
             TextField {
                 id: upperBound
                 width: 90
-                validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+                //validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
             }
         }
 
@@ -71,7 +65,9 @@ Rectangle {
             Button {
                 text: qsTr("Segmenter")
                 onClicked: {
-                    // Start processing logic
+                    let lower = parseFloat(lowerBound.text);
+                    let upper = parseFloat(upperBound.text);
+                    backend.segmentation(lower, upper);
                 }
             }
 
@@ -81,6 +77,21 @@ Rectangle {
                     Qt.quit()
                 }
             }
+        }
+    }
+
+    Connections {
+        target: backend
+        function onFilePathChanged (path) {
+            targetPath.text = path
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            backend.setFilePath(fileDialog.selectedFile)
         }
     }
 }

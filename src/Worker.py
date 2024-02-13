@@ -15,10 +15,20 @@ class Worker(QObject):
         self.edgeX = False
         self.edgeY = False
 
+        self.filePath = ""
+
+        self.lowerThreshold = 0.1
+        self.upperThreshold = 0.2
+
     def setBatchParams(self, folderPath, edgeX, edgeY):
         self.folderPath = folderPath
         self.edgeX = edgeX
         self.edgeY = edgeY
+
+    def setSegmentationParams(self, filePath, lowerThreshold, upperThreshold):
+        self.filePath = filePath
+        self.lowerThreshold = lowerThreshold
+        self.upperThreshold = upperThreshold
 
     @Slot()
     def batchConvert(self):
@@ -49,6 +59,17 @@ class Worker(QObject):
 
         self.progressChanged.emit(1.0)
         self.finished.emit()
+
+
+    @Slot()
+    def segmentation(self):
+        image_gray = load_image_gray(self.filePath)
+        file_name = self.filePath.split('/')[-1].split('.')[0]
+        image_threshold = thresholding(image_gray, (self.lowerThreshold, self.upperThreshold))
+        save_image_gray(image_threshold, f'out/{file_name}_segmented.png')
+
+        self.finished.emit()
+
 
 
 

@@ -41,7 +41,7 @@ def convolution2D(image, kernel):
     return signal.convolve2d(image, kernel, mode='valid')
 
 
-def thresholding(image, threshold=(0.1, 0.2), new_value=1):
+def thresholding(image, threshold=(0.1, 0.2), new_value=1.0):
     image_height, image_width = image.shape
     output = np.zeros((image_height, image_width))
 

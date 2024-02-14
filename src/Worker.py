@@ -36,8 +36,6 @@ class Worker(QObject):
         tif_files = [file for file in files if file.endswith('.tif')]
         file_count = len(tif_files)
 
-        print(self.edgeX, self.edgeY)
-
         progress = 0.0
         self.progressChanged.emit(progress)
 
@@ -65,9 +63,26 @@ class Worker(QObject):
     def segmentation(self):
         image_gray = load_image_gray(self.filePath)
         file_name = self.filePath.split('/')[-1].split('.')[0]
-        image_threshold = thresholding(image_gray, (self.lowerThreshold, self.upperThreshold))
-        save_image_gray(image_threshold, f'out/{file_name}_segmented.png')
 
+        image_height, image_width = image_gray.shape
+        output = np.zeros((image_height, image_width))
+
+        progress = 0.0
+        modulo = np.ceil(image_height / 10)
+        self.progressChanged.emit(progress)
+
+        for i in range(image_height):
+            if i % modulo == 0:
+                progress = i / image_height
+                self.progressChanged.emit(progress)
+
+            for j in range(image_width):
+                if self.lowerThreshold < image_gray[i, j] < self.upperThreshold:
+                    output[i, j] = 1.0
+
+        save_image_gray(output, f'out/{file_name}_segmented.png')
+
+        self.progressChanged.emit(1.0)
         self.finished.emit()
 
 

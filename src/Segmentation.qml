@@ -59,11 +59,17 @@ Rectangle {
             }
         }
 
+        ProgressBar {
+            id: progressBar
+            width: 435
+            value: backend.progress
+        }
+
         Row {
             spacing: 10
 
             Button {
-                text: qsTr("Segmenter")
+                text: qsTr("Start")
                 onClicked: {
                     let lower = parseFloat(lowerBound.text);
                     let upper = parseFloat(upperBound.text);
@@ -84,6 +90,9 @@ Rectangle {
         target: backend
         function onFilePathChanged (path) {
             targetPath.text = path
+        }
+        function onProgressChanged (progress) {
+            progressBar.value = progress
         }
     }
 

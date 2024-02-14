@@ -21,14 +21,10 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 200
+                width: 300
                 placeholderText: qsTr("Velg sti til bilde...")
-            }
-
-            FileDialog {
-                id: fileDialog
-                currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
-                onAccepted: backend.setFilePath(fileDialog.fileUrl)
+                text: backend.filePath
+                readOnly: true
             }
 
             Button {
@@ -37,6 +33,12 @@ Rectangle {
                     fileDialog.open()
                 }
             }
+        }
+
+        ProgressBar {
+            id: progressBar
+            width: 435
+            value: backend.progress
         }
 
         Row {
@@ -53,6 +55,24 @@ Rectangle {
                     Qt.quit()
                 }
             }
+        }
+    }
+
+    Connections {
+        target: backend
+        function onFilePathChanged (path) {
+            targetPath.text = path
+        }
+        function onProgressChanged (progress) {
+            progressBar.value = progress
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            backend.setFilePath(fileDialog.selectedFile)
         }
     }
 }

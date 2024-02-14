@@ -14,7 +14,7 @@ def main():
     backend = Backend()
     engine.rootContext().setContextProperty("backend", backend)
 
-    engine.load(QUrl.fromLocalFile('src/ImageProcessor.qml'))
+    engine.load(QUrl.fromLocalFile('src/main.qml'))
     engine.warnings.connect(lambda warnings: print(warnings))
 
     if not engine.rootObjects():

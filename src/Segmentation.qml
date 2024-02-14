@@ -4,16 +4,16 @@ import QtQuick.Dialogs
 import QtCore
 
 Rectangle {
-    width: 640
-    height: 480
+    width: 1280
+    height: 960
     color: "lightgreen"
 
     Column {
-        spacing: 10
+        spacing: 20
         anchors.centerIn: parent
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("Plassering:")
@@ -21,22 +21,22 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 300
+                width: 600
                 placeholderText: qsTr("Velg sti til bilde...")
                 text: backend.filePath
                 readOnly: true
             }
 
             Button {
-                text: qsTr("Velg Bilde")
+                text: qsTr(" Velg Bilde ")
                 onClicked: {
-                    fileDialog.open()
+                    fileDialog.open();
                 }
             }
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("Nedre Grense:")
@@ -44,7 +44,7 @@ Rectangle {
 
             TextField {
                 id: lowerBound
-                width: 90
+                width: 170
                 validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
             }
 
@@ -54,31 +54,37 @@ Rectangle {
 
             TextField {
                 id: upperBound
-                width: 90
+                width: 170
                 validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
+            }
+
+            CheckBox {
+                id: histogram
+                checked: false
+                text: qsTr("Histogram")
             }
         }
 
         ProgressBar {
             id: progressBar
-            width: 435
+            width: 880
             value: backend.progress
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Button {
-                text: qsTr("Start")
+                text: qsTr(" Start ")
                 onClicked: {
                     let lower = parseFloat(lowerBound.text);
                     let upper = parseFloat(upperBound.text);
-                    backend.segmentation(lower, upper);
+                    backend.segmentation(lower, upper, histogram.checked);
                 }
             }
 
             Button {
-                text: qsTr("Avslutt")
+                text: qsTr(" Avslutt ")
                 onClicked: {
                     Qt.quit()
                 }

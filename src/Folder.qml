@@ -5,16 +5,16 @@ import QtCore
 import QtQml
 
 Rectangle {
-    width: 640
-    height: 480
+    width: 1280
+    height: 960
     color: "lightblue"
 
     Column {
-        spacing: 10
+        spacing: 20
         anchors.centerIn: parent
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("Plassering:")
@@ -22,14 +22,14 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 300
+                width: 600
                 placeholderText: qsTr("Velg sti til mappe...")
                 text: backend.folderPath
                 readOnly: true
             }
 
             Button {
-                text: qsTr("Velg mappe")
+                text: qsTr(" Velg mappe ")
                 onClicked: {
                     folderDialog.open()
                 }
@@ -37,7 +37,7 @@ Rectangle {
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             CheckBox {
                 id: edgeX
@@ -54,22 +54,22 @@ Rectangle {
         // Value goes from 0 to 1, unless specified using "from" and "to"
         ProgressBar {
             id: progressBar
-            width: 445
+            width: 900
             value: backend.progress
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Button {
-                text: qsTr("Start")
+                text: qsTr(" Start ")
                 onClicked: {
                     backend.batchConvert(edgeX.checked, edgeY.checked)
                 }
             }
 
             Button {
-                text: qsTr("Avslutt")
+                text: qsTr(" Avslutt ")
                 onClicked: {
                     Qt.quit()
                 }

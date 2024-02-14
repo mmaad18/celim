@@ -2,4 +2,4 @@
 /src/dist/
 /src/build/
 
-main.spec
+*.spec

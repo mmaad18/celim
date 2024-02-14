@@ -5,10 +5,11 @@ import QtQuick.Layouts
 import QtCore
 
 ApplicationWindow {
-    title: "Image Processing App"
-    width: 640
-    height: 480
+    title: "CelTel - Telling av Celler"
+    width: 1280
+    height: 860
     visible: true
+    font.pixelSize: 24
 
     TabBar {
         id: tabBar

@@ -5,9 +5,12 @@ from PySide6.QtCore import Slot, Signal, QObject
 from ImageManipulations import *
 from skimage import feature
 
+from Processor import saveHistogram
+
 
 class Worker(QObject):
     progressChanged = Signal(float)
+    countChanged = Signal(int)
     finished = Signal()
 
     def __init__(self):
@@ -20,32 +23,34 @@ class Worker(QObject):
 
         self.lowerThreshold = 0.1
         self.upperThreshold = 0.2
+        self.histogram = False
 
         self.minSigma = 10
         self.maxSigma = 30
         self.numSigma = 1
         self.threshold = 0.1
         self.overlap = 0.9
-        self.alive = True
+        self.dead = False
 
     def setBatchParams(self, folderPath, edgeX, edgeY):
         self.folderPath = folderPath
         self.edgeX = edgeX
         self.edgeY = edgeY
 
-    def setSegmentationParams(self, filePath, lowerThreshold, upperThreshold):
+    def setSegmentationParams(self, filePath, lowerThreshold, upperThreshold, histogram):
         self.filePath = filePath
         self.lowerThreshold = lowerThreshold
         self.upperThreshold = upperThreshold
+        self.histogram = histogram
 
-    def setDetectBlobsParams(self, filePath, minSigma, maxSigma, numSigma, threshold, overlap, alive):
+    def setDetectBlobsParams(self, filePath, minSigma, maxSigma, numSigma, threshold, overlap, dead):
         self.filePath = filePath
         self.minSigma = minSigma
         self.maxSigma = maxSigma
         self.numSigma = numSigma
         self.threshold = threshold
         self.overlap = overlap
-        self.alive = alive
+        self.dead = dead
 
     @Slot()
     def batchConvert(self):
@@ -79,7 +84,10 @@ class Worker(QObject):
     @Slot()
     def segmentation(self):
         image_gray = load_image_gray(self.filePath)
-        file_name = self.filePath.split('/')[-1].split('.')[0]
+        file_name = os.path.basename(self.filePath).split('.')[0]
+
+        if self.histogram:
+            saveHistogram(image_gray, file_name)
 
         image_height, image_width = image_gray.shape
         output = np.zeros((image_height, image_width))
@@ -97,7 +105,10 @@ class Worker(QObject):
                 if self.lowerThreshold < image_gray[i, j] < self.upperThreshold:
                     output[i, j] = 1.0
 
-        save_image_gray(output, f'out/{file_name}_segmented.png')
+        low_str = str(self.lowerThreshold).replace('.', '')
+        high_str = str(self.upperThreshold).replace('.', '')
+
+        save_image_gray(output, f'out/{file_name}_segmented_L{low_str}_H{high_str}.png')
 
         self.progressChanged.emit(1.0)
         self.finished.emit()
@@ -106,7 +117,7 @@ class Worker(QObject):
     @Slot()
     def detectBlobs(self):
         image_gray = load_image_gray(self.filePath)
-        file_name = self.filePath.split('/')[-1].split('.')[0]
+        file_name = os.path.basename(self.filePath).split('.')[0]
 
         blobs_log = feature.blob_log(
             image=image_gray,
@@ -124,18 +135,23 @@ class Worker(QObject):
         fig, ax = plt.subplots(1, 1, figsize=inches)
         ax.imshow(image_gray, cmap='gray')
 
-        color = 'green' if self.alive else 'red'
+        color = 'red' if self.dead else 'green'
 
         for blob in blobs_log:
             y, x, r = blob
             c = plt.Circle((x, y), r, color=color, linewidth=1, fill=False)
             ax.add_patch(c)
 
+        count = len(blobs_log)
+        mode = "dead" if self.dead else "total"
+
         plt.axis('off')
-        plt.savefig(f'out/{file_name}_count.png', dpi=dpi, bbox_inches='tight', pad_inches=0.0)
+        plt.savefig(f'out/{file_name}_count_{count}_{mode}.png', dpi=dpi, bbox_inches='tight', pad_inches=0.0)
         plt.close()
 
+        self.countChanged.emit(len(blobs_log))
         self.finished.emit()
+
 
 
 

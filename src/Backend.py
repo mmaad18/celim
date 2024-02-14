@@ -8,12 +8,14 @@ class Backend(QObject):
     folderPathChanged = Signal(str)
     filePathChanged = Signal(str)
     progressChanged = Signal(float)
+    countChanged = Signal(int)
 
     def __init__(self):
         super().__init__()
         self._folderPath = ""
         self._filePath = ""
         self._progress = 0.0
+        self._count = 0
 
         self.setupWorkerAndThread()
 
@@ -24,6 +26,7 @@ class Backend(QObject):
 
         # Connect signals
         self.worker.progressChanged.connect(self.setProgress)
+        self.worker.countChanged.connect(self.setCount)
         self.worker.finished.connect(self.thread.quit)  # Request thread to quit when worker is done
         self.thread.finished.connect(self.cleanUp)  # Cleanup when thread finishes
 
@@ -98,6 +101,24 @@ class Backend(QObject):
         self.progress = progress
 
     '''
+    # Count setup
+    '''
+    @property
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, value):
+        if self._count != value:
+            self._count = value
+            self.countChanged.emit(self._count)
+
+    @Slot(int)
+    def setCount(self, count):
+        print(f"Count: {count}")
+        self.count = count
+
+    '''
     # Batch processing
     '''
     @Slot(bool, bool)
@@ -114,12 +135,12 @@ class Backend(QObject):
     '''
     # Segmentation
     '''
-    @Slot(float, float)
-    def segmentation(self, lowerThreshold, upperThreshold):
+    @Slot(float, float, bool)
+    def segmentation(self, lowerThreshold, upperThreshold, histogram):
         if not self.thread or not self.thread.isRunning():
             self.setupWorkerAndThread()
 
-            self.worker.setSegmentationParams(self.filePath, lowerThreshold, upperThreshold)
+            self.worker.setSegmentationParams(self.filePath, lowerThreshold, upperThreshold, histogram)
             self.thread.started.connect(self.worker.segmentation)
             self.thread.start()
         else:
@@ -130,11 +151,11 @@ class Backend(QObject):
     # Blob detection
     '''
     @Slot(int, int, int, float, float, bool)
-    def detectBlobs(self, minSigma, maxSigma, numSigma, threshold, overlap, alive):
+    def detectBlobs(self, minSigma, maxSigma, numSigma, threshold, overlap, dead):
         if not self.thread or not self.thread.isRunning():
             self.setupWorkerAndThread()
 
-            self.worker.setDetectBlobsParams(self.filePath, minSigma, maxSigma, numSigma, threshold, overlap, alive)
+            self.worker.setDetectBlobsParams(self.filePath, minSigma, maxSigma, numSigma, threshold, overlap, dead)
             self.thread.started.connect(self.worker.detectBlobs)
             self.thread.start()
         else:

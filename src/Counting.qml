@@ -4,16 +4,16 @@ import QtQuick.Dialogs
 import QtCore
 
 Rectangle {
-    width: 640
-    height: 480
+    width: 1280
+    height: 960
     color: "salmon"
 
     Column {
-        spacing: 10
+        spacing: 20
         anchors.centerIn: parent
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("Plassering:")
@@ -21,14 +21,14 @@ Rectangle {
 
             TextField {
                 id: targetPath
-                width: 300
+                width: 600
                 placeholderText: qsTr("Velg sti til bilde...")
                 text: backend.filePath
                 readOnly: true
             }
 
             Button {
-                text: qsTr("Velg Bilde")
+                text: qsTr(" Velg Bilde ")
                 onClicked: {
                     fileDialog.open()
                 }
@@ -36,7 +36,7 @@ Rectangle {
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("MIN Sigma:")
@@ -44,7 +44,7 @@ Rectangle {
 
             TextField {
                 id: minSigma
-                width: 50
+                width: 100
                 validator: RegularExpressionValidator { regularExpression: /^[0-9]*$/ }
             }
 
@@ -54,7 +54,7 @@ Rectangle {
 
             TextField {
                 id: maxSigma
-                width: 50
+                width: 100
                 validator: RegularExpressionValidator { regularExpression: /^[0-9]*$/ }
             }
 
@@ -64,13 +64,13 @@ Rectangle {
 
             TextField {
                 id: numSigma
-                width: 50
+                width: 100
                 validator: RegularExpressionValidator { regularExpression: /^[0-9]*$/ }
             }
         }
 
         Row {
-            spacing: 10
+            spacing: 20
 
             Label {
                 text: qsTr("MIN Lokal Maxima:")
@@ -78,7 +78,7 @@ Rectangle {
 
             TextField {
                 id: threshold
-                width: 50
+                width: 100
                 validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
             }
 
@@ -88,36 +88,61 @@ Rectangle {
 
             TextField {
                 id: overlap
-                width: 50
+                width: 100
                 validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
             }
 
             CheckBox {
-                id: alive
-                checked: true
-                text: qsTr("Levende Celler")
+                id: dead
+                checked: false
+                text: qsTr("Døde Celler")
             }
         }
 
         Row {
-            spacing: 10
+            Column {
+                Row {
+                    width: 400
+                    spacing: 20
 
-            Button {
-                text: qsTr("Start")
-                onClicked: {
-                    let minSigmaValue = parseInt(minSigma.text);
-                    let maxSigmaValue = parseInt(maxSigma.text);
-                    let numSigmaValue = parseInt(numSigma.text);
-                    let thresholdValue = parseFloat(threshold.text);
-                    let overlapValue = parseFloat(overlap.text);
-                    backend.detectBlobs(minSigmaValue, maxSigmaValue, numSigmaValue, thresholdValue, overlapValue, alive.checked);
+                    Button {
+                        text: qsTr(" Start ")
+                        onClicked: {
+                            let minSigmaValue = parseInt(minSigma.text);
+                            let maxSigmaValue = parseInt(maxSigma.text);
+                            let numSigmaValue = parseInt(numSigma.text);
+                            let thresholdValue = parseFloat(threshold.text);
+                            let overlapValue = parseFloat(overlap.text);
+                            backend.detectBlobs(minSigmaValue, maxSigmaValue, numSigmaValue, thresholdValue, overlapValue, dead.checked);
+                        }
+                    }
+
+                    Button {
+                        text: qsTr(" Avslutt ")
+                        onClicked: {
+                            Qt.quit()
+                        }
+                    }
                 }
             }
 
-            Button {
-                text: qsTr("Avslutt")
-                onClicked: {
-                    Qt.quit()
+            Column {
+                Row {
+                    width: 470
+                    spacing: 20
+                    layoutDirection: Qt.RightToLeft
+
+                    TextField {
+                        id: count
+                        width: 100
+                        placeholderText: qsTr("0")
+                        text: backend.count
+                        readOnly: true
+                    }
+
+                    Label {
+                        text: qsTr("Antall:")
+                    }
                 }
             }
         }
@@ -127,6 +152,9 @@ Rectangle {
         target: backend
         function onFilePathChanged (path) {
             targetPath.text = path
+        }
+        function onCountChanged (value) {
+            count.text = value
         }
     }
 

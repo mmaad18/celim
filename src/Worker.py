@@ -3,6 +3,7 @@ import os
 
 from PySide6.QtCore import Slot, Signal, QObject
 from ImageManipulations import *
+from skimage import feature
 
 
 class Worker(QObject):
@@ -20,6 +21,13 @@ class Worker(QObject):
         self.lowerThreshold = 0.1
         self.upperThreshold = 0.2
 
+        self.minSigma = 10
+        self.maxSigma = 30
+        self.numSigma = 1
+        self.threshold = 0.1
+        self.overlap = 0.9
+        self.alive = True
+
     def setBatchParams(self, folderPath, edgeX, edgeY):
         self.folderPath = folderPath
         self.edgeX = edgeX
@@ -29,6 +37,15 @@ class Worker(QObject):
         self.filePath = filePath
         self.lowerThreshold = lowerThreshold
         self.upperThreshold = upperThreshold
+
+    def setDetectBlobsParams(self, filePath, minSigma, maxSigma, numSigma, threshold, overlap, alive):
+        self.filePath = filePath
+        self.minSigma = minSigma
+        self.maxSigma = maxSigma
+        self.numSigma = numSigma
+        self.threshold = threshold
+        self.overlap = overlap
+        self.alive = alive
 
     @Slot()
     def batchConvert(self):
@@ -83,6 +100,41 @@ class Worker(QObject):
         save_image_gray(output, f'out/{file_name}_segmented.png')
 
         self.progressChanged.emit(1.0)
+        self.finished.emit()
+
+
+    @Slot()
+    def detectBlobs(self):
+        image_gray = load_image_gray(self.filePath)
+        file_name = self.filePath.split('/')[-1].split('.')[0]
+
+        blobs_log = feature.blob_log(
+            image=image_gray,
+            min_sigma=self.minSigma,
+            max_sigma=self.maxSigma,
+            num_sigma=self.numSigma,
+            threshold=self.threshold,
+            overlap=self.overlap,
+        )
+
+        dpi = 300
+        width, height = image_gray.shape
+        inches = np.ceil(height / dpi), np.ceil(width / dpi)
+
+        fig, ax = plt.subplots(1, 1, figsize=inches)
+        ax.imshow(image_gray, cmap='gray')
+
+        color = 'green' if self.alive else 'red'
+
+        for blob in blobs_log:
+            y, x, r = blob
+            c = plt.Circle((x, y), r, color=color, linewidth=1, fill=False)
+            ax.add_patch(c)
+
+        plt.axis('off')
+        plt.savefig(f'out/{file_name}_count.png', dpi=dpi, bbox_inches='tight', pad_inches=0.0)
+        plt.close()
+
         self.finished.emit()
 
 

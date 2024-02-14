@@ -45,7 +45,7 @@ Rectangle {
             TextField {
                 id: lowerBound
                 width: 90
-                //validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+                validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
             }
 
             Label {
@@ -55,7 +55,7 @@ Rectangle {
             TextField {
                 id: upperBound
                 width: 90
-                //validator: DoubleValidator { bottom: 0.0; top: 1.0; decimals: 10 }
+                validator: RegularExpressionValidator { regularExpression: /^[0-9.]*$/ }
             }
         }
 

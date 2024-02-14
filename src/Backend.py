@@ -126,4 +126,18 @@ class Backend(QObject):
             print("A segmentation is already running.")
 
 
+    '''
+    # Blob detection
+    '''
+    @Slot(int, int, int, float, float, bool)
+    def detectBlobs(self, minSigma, maxSigma, numSigma, threshold, overlap, alive):
+        if not self.thread or not self.thread.isRunning():
+            self.setupWorkerAndThread()
+
+            self.worker.setDetectBlobsParams(self.filePath, minSigma, maxSigma, numSigma, threshold, overlap, alive)
+            self.thread.started.connect(self.worker.detectBlobs)
+            self.thread.start()
+        else:
+            print("A blob detection is already running.")
+
 
